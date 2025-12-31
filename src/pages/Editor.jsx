@@ -17,6 +17,53 @@ function Editor() {
   const [resumesList, setResumesList] = useState([]);
   const [currentResumeId, setCurrentResumeId] = useState(null);
   const [mode, setMode] = useState("ATS"); // 'ATS' or 'Design'
+  const [exporting, setExporting] = useState(false);
+
+  // Professional colors
+  const colors = {
+    primary: "#1F3B4D",
+    secondary: "#4A90E2",
+    bgForm: "#F5F6F7",
+    inputBorder: "#D1D5DB",
+    buttonText: "#FFFFFF",
+  };
+
+  const inputStyle = {
+    width: "100%",
+    padding: "8px 10px",
+    margin: "5px 0 10px 0",
+    borderRadius: "6px",
+    border: `1px solid ${colors.inputBorder}`,
+    backgroundColor: "#fff",
+    outline: "none",
+    transition: "border 0.2s ease",
+  };
+
+  const sectionStyle = {
+    marginBottom: "20px",
+    padding: "10px",
+    backgroundColor: colors.bgForm,
+    borderRadius: "8px",
+  };
+
+  const buttonStyle = {
+    backgroundColor: colors.primary,
+    color: colors.buttonText,
+    border: "none",
+    padding: "8px 16px",
+    borderRadius: "6px",
+    cursor: "pointer",
+    marginRight: "10px",
+    transition: "all 0.2s ease",
+  };
+
+  const cardStyle = {
+    marginBottom: "10px",
+    padding: "10px",
+    border: `1px solid ${colors.inputBorder}`,
+    borderRadius: "6px",
+    transition: "transform 0.2s ease, box-shadow 0.2s ease",
+  };
 
   // Load user's resumes
   useEffect(() => {
@@ -47,6 +94,7 @@ function Editor() {
 
   // Export to PDF
   const exportPDF = () => {
+    setExporting(true);
     const input = document.getElementById("resume-preview");
     if (!input) return;
 
@@ -58,37 +106,62 @@ function Editor() {
 
       pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
       pdf.save(`${resume.personal.fullName || "resume"}.pdf`);
+      setExporting(false);
     });
   };
 
   return (
-    <div style={{ display: "flex", gap: "40px" }}>
+    <div
+      style={{
+        display: "flex",
+        gap: "40px",
+        padding: "20px",
+        backgroundColor: "#E5E7EB",
+        flexWrap: "wrap",
+      }}
+    >
       {/* Left Column: Form */}
-      <div style={{ width: "50%" }}>
-        <h1>Resume Editor</h1>
+      <div style={{ width: "100%", maxWidth: "600px" }}>
+        <h1 style={{ color: colors.primary }}>Resume Editor</h1>
 
         {/* Mode Toggle & Export */}
         <div style={{ marginBottom: "20px" }}>
           <button
             onClick={() => setMode("ATS")}
-            style={{ fontWeight: mode === "ATS" ? "bold" : "normal" }}
+            style={{
+              ...buttonStyle,
+              backgroundColor:
+                mode === "ATS" ? colors.primary : colors.secondary,
+            }}
+            onMouseEnter={(e) =>
+              (e.currentTarget.style.backgroundColor = colors.secondary)
+            }
+            onMouseLeave={(e) =>
+              (e.currentTarget.style.backgroundColor =
+                mode === "ATS" ? colors.primary : colors.secondary)
+            }
           >
             ATS Mode
           </button>
           <button
             onClick={() => setMode("Design")}
             style={{
-              fontWeight: mode === "Design" ? "bold" : "normal",
-              marginLeft: "10px",
+              ...buttonStyle,
+              backgroundColor:
+                mode === "Design" ? colors.primary : colors.secondary,
             }}
+            onMouseEnter={(e) =>
+              (e.currentTarget.style.backgroundColor = colors.secondary)
+            }
+            onMouseLeave={(e) =>
+              (e.currentTarget.style.backgroundColor =
+                mode === "Design" ? colors.primary : colors.secondary)
+            }
           >
             Design Mode
           </button>
-          <button
-            onClick={exportPDF}
-            style={{ marginLeft: "20px", background: "#ff69b4", color: "#fff" }}
-          >
-            Export as PDF
+          <button onClick={exportPDF} style={buttonStyle} disabled={exporting}>
+            {exporting ? "Generating PDF..." : "Export as PDF"}
           </button>
         </div>
 
@@ -97,17 +170,32 @@ function Editor() {
           <div style={{ marginBottom: "20px" }}>
             <h2>Your Resumes</h2>
             {resumesList.map((r) => (
-              <button key={r.id} onClick={() => loadResume(r)}>
+              <button
+                key={r.id}
+                onClick={() => loadResume(r)}
+                style={{
+                  ...buttonStyle,
+                  marginBottom: "5px",
+                  backgroundColor: colors.secondary,
+                }}
+                onMouseEnter={(e) =>
+                  (e.currentTarget.style.backgroundColor = colors.primary)
+                }
+                onMouseLeave={(e) =>
+                  (e.currentTarget.style.backgroundColor = colors.secondary)
+                }
+              >
                 {r.title || "Untitled Resume"}
               </button>
             ))}
           </div>
         )}
 
-        {/* Personal Information */}
-        <section>
+        {/* Sections */}
+        <section style={sectionStyle}>
           <h2>Personal Information</h2>
           <input
+            style={inputStyle}
             type="text"
             placeholder="Full Name"
             value={resume.personal.fullName}
@@ -117,8 +205,15 @@ function Editor() {
                 personal: { ...resume.personal, fullName: e.target.value },
               })
             }
+            onFocus={(e) =>
+              (e.currentTarget.style.borderColor = colors.secondary)
+            }
+            onBlur={(e) =>
+              (e.currentTarget.style.borderColor = colors.inputBorder)
+            }
           />
           <input
+            style={inputStyle}
             type="email"
             placeholder="Email"
             value={resume.personal.email}
@@ -128,8 +223,15 @@ function Editor() {
                 personal: { ...resume.personal, email: e.target.value },
               })
             }
+            onFocus={(e) =>
+              (e.currentTarget.style.borderColor = colors.secondary)
+            }
+            onBlur={(e) =>
+              (e.currentTarget.style.borderColor = colors.inputBorder)
+            }
           />
           <input
+            style={inputStyle}
             type="text"
             placeholder="Phone"
             value={resume.personal.phone}
@@ -139,8 +241,15 @@ function Editor() {
                 personal: { ...resume.personal, phone: e.target.value },
               })
             }
+            onFocus={(e) =>
+              (e.currentTarget.style.borderColor = colors.secondary)
+            }
+            onBlur={(e) =>
+              (e.currentTarget.style.borderColor = colors.inputBorder)
+            }
           />
           <textarea
+            style={inputStyle}
             placeholder="Professional Summary"
             value={resume.personal.summary}
             onChange={(e) =>
@@ -149,33 +258,46 @@ function Editor() {
                 personal: { ...resume.personal, summary: e.target.value },
               })
             }
+            onFocus={(e) =>
+              (e.currentTarget.style.borderColor = colors.secondary)
+            }
+            onBlur={(e) =>
+              (e.currentTarget.style.borderColor = colors.inputBorder)
+            }
           />
         </section>
 
-        {/* Skills */}
-        <section>
+        <section style={sectionStyle}>
           <h2>Skills</h2>
           <textarea
+            style={inputStyle}
             placeholder="e.g. React, JavaScript, CSS"
             value={resume.skills}
             onChange={(e) => setResume({ ...resume, skills: e.target.value })}
+            onFocus={(e) =>
+              (e.currentTarget.style.borderColor = colors.secondary)
+            }
+            onBlur={(e) =>
+              (e.currentTarget.style.borderColor = colors.inputBorder)
+            }
           />
         </section>
 
-        {/* Experience */}
-        <section>
+        <section style={sectionStyle}>
           <h2>Experience</h2>
           {resume.experience.map((exp, idx) => (
             <div
               key={idx}
-              style={{
-                marginBottom: "10px",
-                border: "1px solid #ccc",
-                padding: "10px",
-              }}
+              style={cardStyle}
+              onMouseEnter={(e) =>
+                (e.currentTarget.style.transform = "translateY(-2px)")
+              }
+              onMouseLeave={(e) =>
+                (e.currentTarget.style.transform = "translateY(0)")
+              }
             >
               <input
-                type="text"
+                style={inputStyle}
                 placeholder="Company"
                 value={exp.company}
                 onChange={(e) => {
@@ -185,7 +307,7 @@ function Editor() {
                 }}
               />
               <input
-                type="text"
+                style={inputStyle}
                 placeholder="Role"
                 value={exp.role}
                 onChange={(e) => {
@@ -195,7 +317,7 @@ function Editor() {
                 }}
               />
               <input
-                type="text"
+                style={inputStyle}
                 placeholder="Start Year"
                 value={exp.start}
                 onChange={(e) => {
@@ -205,7 +327,7 @@ function Editor() {
                 }}
               />
               <input
-                type="text"
+                style={inputStyle}
                 placeholder="End Year"
                 value={exp.end}
                 onChange={(e) => {
@@ -215,6 +337,7 @@ function Editor() {
                 }}
               />
               <textarea
+                style={inputStyle}
                 placeholder="Description"
                 value={exp.description}
                 onChange={(e) => {
@@ -224,6 +347,7 @@ function Editor() {
                 }}
               />
               <button
+                style={{ ...buttonStyle, backgroundColor: colors.secondary }}
                 onClick={() => {
                   const newExp = resume.experience.filter((_, i) => i !== idx);
                   setResume({ ...resume, experience: newExp });
@@ -234,6 +358,7 @@ function Editor() {
             </div>
           ))}
           <button
+            style={{ ...buttonStyle, backgroundColor: colors.secondary }}
             onClick={() =>
               setResume({
                 ...resume,
@@ -254,20 +379,21 @@ function Editor() {
           </button>
         </section>
 
-        {/* Education */}
-        <section>
+        <section style={sectionStyle}>
           <h2>Education</h2>
           {resume.education.map((edu, idx) => (
             <div
               key={idx}
-              style={{
-                marginBottom: "10px",
-                border: "1px solid #ccc",
-                padding: "10px",
-              }}
+              style={cardStyle}
+              onMouseEnter={(e) =>
+                (e.currentTarget.style.transform = "translateY(-2px)")
+              }
+              onMouseLeave={(e) =>
+                (e.currentTarget.style.transform = "translateY(0)")
+              }
             >
               <input
-                type="text"
+                style={inputStyle}
                 placeholder="School / University"
                 value={edu.school}
                 onChange={(e) => {
@@ -277,7 +403,7 @@ function Editor() {
                 }}
               />
               <input
-                type="text"
+                style={inputStyle}
                 placeholder="Degree"
                 value={edu.degree}
                 onChange={(e) => {
@@ -287,7 +413,7 @@ function Editor() {
                 }}
               />
               <input
-                type="text"
+                style={inputStyle}
                 placeholder="Start Year"
                 value={edu.start}
                 onChange={(e) => {
@@ -297,7 +423,7 @@ function Editor() {
                 }}
               />
               <input
-                type="text"
+                style={inputStyle}
                 placeholder="End Year"
                 value={edu.end}
                 onChange={(e) => {
@@ -307,6 +433,7 @@ function Editor() {
                 }}
               />
               <button
+                style={{ ...buttonStyle, backgroundColor: colors.secondary }}
                 onClick={() => {
                   const newEdu = resume.education.filter((_, i) => i !== idx);
                   setResume({ ...resume, education: newEdu });
@@ -317,6 +444,7 @@ function Editor() {
             </div>
           ))}
           <button
+            style={{ ...buttonStyle, backgroundColor: colors.secondary }}
             onClick={() =>
               setResume({
                 ...resume,
@@ -333,7 +461,17 @@ function Editor() {
       </div>
 
       {/* Right Column: Live Preview */}
-      <div style={{ width: "50%", background: "#fff", padding: "20px" }}>
+      <div
+        style={{
+          width: "100%",
+          maxWidth: "600px",
+          marginTop: "20px",
+          backgroundColor: "#FFFFFF",
+          padding: "20px",
+          borderRadius: "8px",
+          boxShadow: "0 2px 6px rgba(0,0,0,0.1)",
+        }}
+      >
         <ResumePreview resume={resume} mode={mode} />
       </div>
     </div>
