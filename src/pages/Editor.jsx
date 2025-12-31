@@ -14,6 +14,7 @@ function Editor() {
   });
   const [resumesList, setResumesList] = useState([]); // List of user's resumes
   const [currentResumeId, setCurrentResumeId] = useState(null);
+  const [mode, setMode] = useState("ATS"); // 'ATS' or 'Design'
 
   // Load user's resumes on mount
   useEffect(() => {
@@ -47,6 +48,25 @@ function Editor() {
       {/* Left Column: Form */}
       <div style={{ width: "50%" }}>
         <h1>Resume Editor</h1>
+
+        {/* Mode Toggle */}
+        <div style={{ marginBottom: "20px" }}>
+          <button
+            onClick={() => setMode("ATS")}
+            style={{ fontWeight: mode === "ATS" ? "bold" : "normal" }}
+          >
+            ATS Mode
+          </button>
+          <button
+            onClick={() => setMode("Design")}
+            style={{
+              fontWeight: mode === "Design" ? "bold" : "normal",
+              marginLeft: "10px",
+            }}
+          >
+            Design Mode
+          </button>
+        </div>
 
         {/* Saved resumes list */}
         {resumesList.length > 0 && (
@@ -290,7 +310,7 @@ function Editor() {
 
       {/* Right Column: Live Preview */}
       <div style={{ width: "50%", background: "#fff", padding: "20px" }}>
-        <ResumePreview resume={resume} />
+        <ResumePreview resume={resume} mode={mode} />
       </div>
     </div>
   );
