@@ -3,6 +3,8 @@ import { useState, useEffect } from "react";
 import ResumePreview from "../components/ResumePreview";
 import { useAuth } from "../context/AuthContext";
 import { saveResume, getResumes } from "../supabase/resume";
+import jsPDF from "jspdf";
+import html2canvas from "html2canvas";
 
 function Editor() {
   const { user } = useAuth();
@@ -12,11 +14,11 @@ function Editor() {
     experience: [],
     education: [],
   });
-  const [resumesList, setResumesList] = useState([]); // List of user's resumes
+  const [resumesList, setResumesList] = useState([]);
   const [currentResumeId, setCurrentResumeId] = useState(null);
   const [mode, setMode] = useState("ATS"); // 'ATS' or 'Design'
 
-  // Load user's resumes on mount
+  // Load user's resumes
   useEffect(() => {
     if (!user) return;
     async function fetchResumes() {
@@ -26,7 +28,7 @@ function Editor() {
     fetchResumes();
   }, [user]);
 
-  // Auto-save with debounce (1s)
+  // Auto-save
   useEffect(() => {
     if (!user) return;
     const timer = setTimeout(() => {
@@ -37,10 +39,26 @@ function Editor() {
     return () => clearTimeout(timer);
   }, [resume]);
 
-  // Load a selected resume
+  // Load selected resume
   const loadResume = (r) => {
     setResume(r.data);
     setCurrentResumeId(r.id);
+  };
+
+  // Export to PDF
+  const exportPDF = () => {
+    const input = document.getElementById("resume-preview");
+    if (!input) return;
+
+    html2canvas(input, { scale: 2 }).then((canvas) => {
+      const imgData = canvas.toDataURL("image/png");
+      const pdf = new jsPDF("p", "mm", "a4");
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+
+      pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
+      pdf.save(`${resume.personal.fullName || "resume"}.pdf`);
+    });
   };
 
   return (
@@ -49,7 +67,7 @@ function Editor() {
       <div style={{ width: "50%" }}>
         <h1>Resume Editor</h1>
 
-        {/* Mode Toggle */}
+        {/* Mode Toggle & Export */}
         <div style={{ marginBottom: "20px" }}>
           <button
             onClick={() => setMode("ATS")}
@@ -65,6 +83,12 @@ function Editor() {
             }}
           >
             Design Mode
+          </button>
+          <button
+            onClick={exportPDF}
+            style={{ marginLeft: "20px", background: "#ff69b4", color: "#fff" }}
+          >
+            Export as PDF
           </button>
         </div>
 

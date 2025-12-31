@@ -2,7 +2,6 @@
 import React from "react";
 
 function ResumePreview({ resume, mode }) {
-  // Styles for each mode
   const containerStyle =
     mode === "Design"
       ? {
@@ -21,18 +20,8 @@ function ResumePreview({ resume, mode }) {
           backgroundColor: "#fff",
         };
 
-  const sectionStyle = {
-    marginBottom: "15px",
-  };
-
-  const headingStyle = {
-    marginBottom: "5px",
-    borderBottom: mode === "Design" ? "2px solid #ff69b4" : "1px solid #000",
-  };
-
   return (
-    <div style={containerStyle}>
-      {/* Personal Info */}
+    <div id="resume-preview" style={containerStyle}>
       <h1 style={{ margin: 0 }}>{resume.personal.fullName || "Your Name"}</h1>
       <p style={{ margin: "5px 0" }}>
         {resume.personal.email || "email@example.com"} |{" "}
@@ -40,25 +29,22 @@ function ResumePreview({ resume, mode }) {
       </p>
       <hr />
 
-      {/* Professional Summary */}
       {resume.personal.summary && (
-        <section style={sectionStyle}>
-          <h2 style={headingStyle}>Professional Summary</h2>
+        <section style={{ marginBottom: "15px" }}>
+          <h2>Professional Summary</h2>
           <p>{resume.personal.summary}</p>
         </section>
       )}
 
-      {/* Skills */}
       {resume.skills && (
-        <section style={sectionStyle}>
-          <h2 style={headingStyle}>Skills</h2>
+        <section style={{ marginBottom: "15px" }}>
+          <h2>Skills</h2>
           <p>{resume.skills}</p>
         </section>
       )}
 
-      {/* Experience */}
-      <section style={sectionStyle}>
-        <h2 style={headingStyle}>Experience</h2>
+      <section style={{ marginBottom: "15px" }}>
+        <h2>Experience</h2>
         {resume.experience.length === 0 ? (
           <p>No experience added.</p>
         ) : (
@@ -75,9 +61,8 @@ function ResumePreview({ resume, mode }) {
         )}
       </section>
 
-      {/* Education */}
-      <section style={sectionStyle}>
-        <h2 style={headingStyle}>Education</h2>
+      <section style={{ marginBottom: "15px" }}>
+        <h2>Education</h2>
         {resume.education.length === 0 ? (
           <p>No education added.</p>
         ) : (
