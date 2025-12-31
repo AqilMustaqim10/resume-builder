@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import ProtectedRoute from "./components/ProtectedRoute";
+import Editor from "./pages/Editor";
 
 function App() {
   return (
@@ -11,12 +12,11 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
 
-        {/* Protected route */}
         <Route
           path="/editor"
           element={
             <ProtectedRoute>
-              <h1>Resume Editor (Protected)</h1>
+              <Editor />
             </ProtectedRoute>
           }
         />
